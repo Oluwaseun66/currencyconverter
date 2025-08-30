@@ -1,4 +1,4 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Currency Converter</title>
@@ -40,93 +40,53 @@ DOCTYPE html>
   <h2>Currency Converter</h2>
   <input type="number" id="amount" placeholder="Enter amount" />
   <br />
-  <select id="from">
+  <select id="from-currency">
     <option value="USD">USD</option>
     <option value="NGN">NGN</option>
     <option value="EUR">EUR</option>
     <option value="GBP">GBP</option>
   </select>
   to
-  <select id="to">
+  <select id="to-currency">
     <option value="NGN">NGN</option>
     <option value="USD">USD</option>
     <option value="EUR">EUR</option>
-    <option value="GBP">GBP</option>
-  </select>
-  <br />
-<button onclick="convert()">Convert</button>
-  <div id="result"></div>
-
-  <script>
-    async function convert() {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const from = document.getElementById('from').value;
-      const to = document.getElementById('to').value;
-
-      if (isNaN(amount)) {
-        alert('Enter a valid amount.');
-        return;
-      }
-
-      try {
-        const res = await fetch(`https://api.exchangerate-api.com/v4/latest/from`);
-        if (!res.ok) 
-          throw new Error('Network response was not ok');
-        
-        const data = await res.json();
-
-        if (!data.rates || !data.rates[to]) 
-          alert('Currency not supported');
-          return;
-        
-
-        const rate = data.rates[to];
-        const converted = (amount * rate).toFixed(2);
-
-        document.getElementById('result').innerText = `{amount} from ={converted} ${to}`;
-      } catch (error) {
-        alert('Error fetching exchange rates: ' + error.message);
-      }
-    }
-  </script>
-</body>
-</html>
 <option value="GBP">GBP</option>
   </select>
   <br />
-  <button onclick="convert()">Convert</button>
+  <button id="convert-btn">Convert</button>
+
   <div id="result"></div>
 
   <script>
-    async function convert() {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const from = document.getElementById('from').value;
-      const to = document.getElementById('to').value;
+    document.getElementById("convert-btn").addEventListener("click", function () {
+      const amount = parseFloat(document.getElementById("amount").value);
+      const from = document.getElementById("from-currency").value;
+      const to = document.getElementById("to-currency").value;
 
-      if (isNaN(amount)) {
-        alert('Enter a valid amount.');
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount.");
         return;
       }
 
-      try {
-        const res = await fetch(`https://api.frankfurter.app/latest?from=from   to={to}`);
-        if (!res.ok) throw new Error('Network response was not ok');
+      const url = `https://api.exchangerate.host/convert?from=from   to={to}&amount=amount`;
 
-        const data = await res.json();
-
-        if (!data.rates || !data.rates[to]) {
-          alert('Currency not supported');
-          return;
-        }
-
-        const rate = data.rates[to];
-        const converted = (amount * rate).toFixed(2);
-
-        document.getElementById('result').innerText = `amount{from} = converted{to}`;
-      } catch (error) {
-        alert('Error fetching exchange rates: ' + error.message);
-      }
-    }
+      fetch(url)
+        .then(response => 
+          if (!response.ok) throw new Error("Network response was not ok");
+          return response.json();
+        )
+        .then(data => 
+          if (data.result) 
+            document.getElementById("result").innerText = `{amount} from ={data.result.toFixed(2)} ${to}`;
+          } else {
+            alert("Conversion failed. Try again.");
+          }
+        })
+        .catch(error => {
+          alert("Error fetching exchange rates: " + error.message);
+        });
+    });
   </script>
 </body>
-    </html>
+</html>
